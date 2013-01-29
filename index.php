@@ -1,20 +1,22 @@
 <?php
-echo "<html><head><title>Glass Eye</title></head><body bgcolor=\"black\" text=\"white\"><p align=\"center\"><img src=\"images\header.png\"></p>";
-
+session_start();
 require_once("config.php");
 require_once("mirror-client.php");
 
-if ($_POST['operation'] == "installApp")
-{
-login_user();
+$token = null;
+if ($_POST['operation'] == "installApp") {
+  $token = login_user();
 }
 
-if (array_key_exists('token', $_SESSION))
-{
-login_user();
+if (array_key_exists('token', $_SESSION)) {
+  $token = login_user();
 }
-else
-{
+
+echo "<html><head><title>Glass Eye</title></head><body bgcolor=\"black\" text=\"white\"><p align=\"center\"><img src=\"images\header.png\"></p>";
+
+if ($token) {
+  
+} else {
 echo "
 <form method=\"post\">
   <input type=\"hidden\" name=\"operation\" value=\"installApp\"/>

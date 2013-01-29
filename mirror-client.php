@@ -554,14 +554,13 @@ function login_user() {
 	session_start();
 	$token = null;
 
+	$client = get_gclient();
 	if (array_key_exists('token',$_SESSION)) {
 		$token = $_SESSION['token'];
-		$client = get_gclient($token);
+		$client->setAccessToken($token);
 	} elseif (array_key_exists('code',$_GET)) {
-		$client = get_gclient();
 		$client->authenticate();
 		$_SESSION['token'] = $token = $client->getAccessToken();
-
 	}
 
 	if (!$token) {
