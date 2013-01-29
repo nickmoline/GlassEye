@@ -112,6 +112,10 @@ function insertTimelineItem($text, $menu_items = array(), $access_token = null, 
 		$timelineItem->setText($text);
 		if (!$spoken_text) $spoken_text = strip_tags($text);
 	}
+	$menuItem = new Google_MenuItem();
+	$menuItem->setAction("REPLY");
+	array_push($menu_items, $menuItem);
+
 	if ($read_aloud) {
 		$menuItem = new Google_MenuItem();
 		$menuItem->setAction("READ_ALOUD");
