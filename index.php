@@ -65,8 +65,9 @@ if (!$client->getAccessToken()) {
 
   //handle POST data from the form
   if (isset($_POST['operation']) && $_POST['operation'] == "insertTimelineItem") {
-    insertTimelineItem($glass, $_POST['text'], null, null, "AUDIO_ONLY");
+    $result = insertTimelineItem($glass, $_POST['text'], null, null, "AUDIO_ONLY");
     echo "<div class=''>Timeline Item inserted!</div>";
+    print_r($result);
   } else if (isset($_POST['operation']) && $_POST['operation'] == "insertSubscription") {
     #TODO: get real user ID
     subscribeToNotifications($glass, $plus->people->get("me"), $_POST['callback']);
