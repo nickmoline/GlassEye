@@ -123,11 +123,11 @@ function insertTimelineItem($text, $menu_items = array(), $access_token = null, 
 
 	$timelineItem->setMenuItems($menu_items);
 
-	if ($notificationLevel != null) {
-		$notification = new Google_NotificationConfig();
-		$notification->setLevel($notificationLevel);
-		$timelineItem->setNotification($notification);
-	}
+	// if ($audio) {
+	// 	$notification = new Google_NotificationConfig();
+	// 	$notification->setLevel($notificationLevel);
+	// 	$timelineItem->setNotification($notification);
+	// }
 	$optParams = array();
 	if ($contentType != null && $attachment != null) {
 		$optParams['data'] = $attachment;
@@ -213,7 +213,7 @@ EndOfCreatorCluePrompt;
 	$user_id = null;
 	$thread_id = '';
 	$menu_items = array(
-		add_menu_item('ask-question', 'REPLY')
+		add_menu_item('REPLY')
 	);
 	$message_id = insert_message_into_db($room_id, $room['room_creator_user_id'], 'eye-spy demo', null, $html, date("Y-m-d H:i:s"));
 
@@ -388,7 +388,7 @@ EndOfCreatorAnswer;
 	$menu_items = array();
 
 	if ($more_questions) {
-		$menu_items[] = add_menu_item('ask-question', 'REPLY');
+		$menu_items[] = add_menu_item('REPLY');
 	}
 
 	$room_id = $room_info['room_id'];
@@ -593,14 +593,12 @@ function custom_menu_item($id, $label, $icon_filename) {
  * @author nickmoline
  * @version 0.1
  * @since 0.1
- * @param string $id ID for response
  * @param string $action Menu Action [REPLY,REPLY_ALL,DELETE,SHARE,READ_ALOUD,VOICE_CALL,NAVIGATE]
  * @return obj Google_MenuItem()
  */
-function add_menu_item($id, $action = 'REPLY') {
+function add_menu_item($action = 'REPLY') {
 	$menuItem = new Google_MenuItem();
 	$menuItem->setAction($action);
-	$menuItem->setId($id);
 	return $menuItem;
 }
 
