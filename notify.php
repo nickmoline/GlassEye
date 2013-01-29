@@ -36,7 +36,7 @@ if($post_body != null) {
 
 	$glass = get_glass($user_info['user_token']);
 	$client = get_gclient($user_info['user_token']);
-	
+
 	if (array_key_exists('menuActions',$notification)) {
 		foreach ($notification['menuActions'] as $action) {
 			$previous_answer = get_message_by_timeline_id($notification['itemId']);
@@ -78,7 +78,7 @@ if($post_body != null) {
 		$image_url = '';
 
 		foreach ($share_targets as $share_target) {
-			if ($share_target->getId() == 'glass-eye') {
+			if ($share_target['id'] == 'glass-eye') {
 				$attachments = $timelineItem['attachments'];
 				if ($attachments) {
 					foreach ($attachments as $attachment) {
