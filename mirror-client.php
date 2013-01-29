@@ -568,8 +568,8 @@ function login_user() {
 		die();
 	}
 
-	$plus = get_plus($token);
-	$profile = getProfile($plus, "me");
+	$profile = getProfile(get_plus($token), "me");
+	print_r($profile);
 	$plus_id = $profile['id'];
 	$plus_name = $profile['name']['formatted'];
 
