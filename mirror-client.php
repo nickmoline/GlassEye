@@ -12,7 +12,6 @@
 require_once 'sample/google-api-php-client/src/Google_Client.php';
 require_once 'sample/google-api-php-client/src/contrib/Google_GlassService.php';
 require_once 'sample/google-api-php-client/src/contrib/Google_PlusService.php';
-require_once 'sample/plus-client.php';
 
 
 /**
@@ -551,6 +550,69 @@ function subscribeToNotifications($service, $userToken, $callbackUrl) {
   }
 }
 
+function login_user() {
+	$token = null;
+	if ($_SESSION['token']) { $token = $_SESSION['token']; }
+
+
+	$client = get_gclient($token);
+
+	if (isset($_GET['code'])) {
+		$client->authenticate();
+		$_SESSION['token'] = $token = $client->getAccessToken();
+
+		$plus = get_gplus($token);
+
+		$profile = getProfile($plus, "me");
+		$plus_id = $profile['id'];
+		$plus_name = $profile['name']['formatted'];
+
+		global $db;
+		
+
+		$stmt = $db->prepare(
+			"INSERT INTO users
+				(
+					user_name,
+					user_token,
+					user_plus_id
+				)
+			VALUES
+				(
+					:username,
+					:usertoken,
+					:userplusid
+				)"
+		);
+
+
+		$redirect = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
+		header('Location: ' . filter_var($redirect, FILTER_SANITIZE_URL));
+	}
+
+	if (isset($_SESSION['token'])) {
+		$client->setAccessToken($_SESSION['token']);
+	}
+
+}
+
+function get_user_by_plusid($plus_id) {
+	global $db;
+
+	$stmt = $db->prepare("SELECT * FROM users WHERE user_plus_id = :plusid");
+	$stmt->bindValue(":plusid", $plus_id, PDO::PARAM_STR);
+	$stmt->execute();
+	return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function get_user_by_token($token) {
+	global $db;
+
+	$stmt = $db->prepare("SELECT * FROM users WHERE user_token = :token");
+	$stmt->bindValue(":token", $token, PDO::PARAM_STR);
+	$stmt->execute();
+	return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
 /**
  * Insert Share Target
@@ -566,4 +628,19 @@ function insertShareTarget($service, $shareTargetId, $displayName, $iconUrl) {
     print 'An error ocurred: ' . $e->getMessage();
     return null;
   }
+}
+
+// Just a couple of functions that help us figure out who is logged in
+function getProfile($service, $user_id) {
+  return $service->people->get($user_id);
+}
+
+function getCurrentProfileId($service) {
+  $current_user = getProfile($service, "me");
+  return $current_user['id'];
+}
+
+function getCurrentProfileName($service) {
+	$current_user = getProfile($service, "me");
+	return $current_user['name']['formatted'];
 }
