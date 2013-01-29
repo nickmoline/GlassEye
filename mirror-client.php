@@ -326,10 +326,70 @@ EndOfCreatorAnswer;
 		$menu_items[] = add_menu_item('ask-question', 'REPLY');
 	}
 
+	global $db;
+	$message_stmt = $db->prepare(
+		"INSERT INTO messages
+			(
+				message_room_id, 
+				message_creator_user_id, 
+				message_creator_timeline_id, 
+				message_text,
+				message_response,
+				message_html, 
+				message_timestamp
+			)
+		VALUES
+			(
+				:roomid,
+				:creatoruid,
+				:messagetext,
+				:messageresponse,
+				:messagehtml,
+				:messagets
+			)"
+	);
+	$message_stmt->bindValue(":roomid", $room_info['room_id'], PDO::PARAM_INT);
+	$message_stmt->bindValue(":creatoruid", $room_info['room_creator_user_id'], PDO::PARAM_INT);
+	$message_stmt->bindValue(":messagetext", $question, PDO::PARAM_STR);
+	$message_stmt->bindValue(":messageresponse", $answer_text, PDO::PARAM_STR);
+	$message_stmt->bindValue(":messagehtml", $html, PDO::PARAM_STR);
+	$message_stmt->bindValue(":messagets", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+
+	$message_stmt->execute();
+	$message_id = $db->lastInsertId();
+
 	$room_id = $room_info['room_id'];
 	$recipients = get_room_recipients($room_info['room_id'], false);
+	$recip_stmt = $db->prepare(
+		"INSERT INTO messages_timeline 
+			(
+				message_id, 
+				user_id, 
+				timeline_id, 
+				sent_timestamp
+			) 
+		VALUES(
+			:messageid, 
+			:userid, 
+			:timelineid, 
+			:senttimestamp
+		)");
+
+	$recip_uid = null;
+	$recip_timeline_id = null;
+	$recip_sentts = null;
+
+	$recip_stmt->bindValue(":messageid", $message_id, PDO::PARAM_INT);
+	$recip_stmt->bindParam(":userid", $recip_uid, PDO::PARAM_INT);
+	$recip_stmt->bindParam(":timelineid", $recip_timeline_id, PDO::PARAM_STR);
+	$recip_stmt->bindParam(":senttimestamp", $recip_sentts, PDO::PARAM_STR);
+
 	foreach ($recipients as $recipient_info) {
-		$item = insertTimelineItem($html, $menu_items, $recipient_info['token'], $recipient_info['threadid'], true, true, $spoken_text);
+		$item = insertTimelineItem($html, $menu_items, $recipient_info['user_token'], $recipient_info['thread_id'], true, true, $spoken_text);
+		$recip_uid = $recipient_info['user_id'];
+		$recip_timeline_id = $item['id'];
+		$recip_sentts = date("Y-m-d H:i:s", strtotime($item['created']));
+		$recip_stmt->execute();
 	}
 }
 
