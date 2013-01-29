@@ -551,25 +551,59 @@ function subscribeToNotifications($service, $userToken, $callbackUrl) {
 }
 
 function login_user() {
+	session_start();
 	$token = null;
-	if ($_SESSION['token']) { $token = $_SESSION['token']; }
 
-
-	$client = get_gclient($token);
-
-	if (isset($_GET['code'])) {
+	if (array_key_exists('token',$_SESSION)) {
+		$token = $_SESSION['token'];
+		$client = get_gclient($token);
+	} elseif (array_key_exists('code',$_GET)) {
+		$client = get_gclient();
 		$client->authenticate();
 		$_SESSION['token'] = $token = $client->getAccessToken();
 
-		$plus = get_gplus($token);
+	}
 
-		$profile = getProfile($plus, "me");
-		$plus_id = $profile['id'];
-		$plus_name = $profile['name']['formatted'];
+	if (!$token) {
+		header('Location: ' . $client->createAuthUrl());
+		die();
+	}
 
-		global $db;
-		
+	$plus = get_gplus($token);
+	$profile = getProfile($plus, "me");
+	$plus_id = $profile['id'];
+	$plus_name = $profile['name']['formatted'];
 
+	save_userinfo($token, $plus_id, $plus_name);
+
+	$glass = get_glass($token);
+	insertShareTarget($glass, "glass-eye", "Glass Eye", SERVICE_BASE_URL."images/logoHorizontal.png");
+	subscribeToNotifications($glass, $plus_id, SERVICE_BASE_URL."notify.php");
+	return $token;
+}
+
+function save_userinfo($token, $plus_id, $plus_name) {
+	global $db;
+	
+	$existing_user = get_user_by_plusid($plus_id);
+
+	if ($existing_user) {
+		$stmt = $db->prepare(
+			"UPDATE users u
+				SET 
+					u.user_name = :username,
+					u.user_token = :usertoken,
+					u.user_plus_id = :userplusid
+				WHERE
+					u.user_id = :existinguid"
+		);
+		$stmt->bindValue(":existinguid",	$existing_user['user_id'],	PDO::PARAM_INT);
+		$stmt->bindValue(":username",		$plus_name,					PDO::PARAM_STR);
+		$stmt->bindValue(":usertoken",		$token,						PDO::PARAM_STR);
+		$stmt->bindValue(":userplusid",		$plus_id,					PDO::PARAM_STR);
+		$stmt->execute();
+		return $existing_user['user_id'];
+	} else {
 		$stmt = $db->prepare(
 			"INSERT INTO users
 				(
@@ -584,16 +618,21 @@ function login_user() {
 					:userplusid
 				)"
 		);
+		$stmt->bindValue(":username",		$plus_name,					PDO::PARAM_STR);
+		$stmt->bindValue(":usertoken",		$token,						PDO::PARAM_STR);
+		$stmt->bindValue(":userplusid",		$plus_id,					PDO::PARAM_STR);
+		$stmt->execute();
+		return $db->lastInsertId();
+	}	
+}
 
+function get_user_by_id($user_id) {
+	global $db;
 
-		$redirect = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
-		header('Location: ' . filter_var($redirect, FILTER_SANITIZE_URL));
-	}
-
-	if (isset($_SESSION['token'])) {
-		$client->setAccessToken($_SESSION['token']);
-	}
-
+	$stmt = $db->prepare("SELECT * FROM users WHERE user_id = :userid");
+	$stmt->bindValue(":userid", $user_id, PDO::PARAM_INT);
+	$stmt->execute();
+	return $stmt->fetch(PDO::FETCH_ASSOC);	
 }
 
 function get_user_by_plusid($plus_id) {
