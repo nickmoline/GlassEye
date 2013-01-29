@@ -32,7 +32,9 @@ if($post_body != null) {
 	fwrite ($file, "$post_body\n");
 	$notification = json_decode($post_body, true);
 
-	$glass = get_glass();
+	$user_info = get_user_by_plusid($notification['userToken']);
+
+	$glass = get_glass($user_info['user_token']);
 
 	if (array_key_exists('menuActions',$notification)) {
 		foreach ($notification['menuActions'] as $action) {
@@ -78,7 +80,7 @@ if($post_body != null) {
 							fwrite($out, $image_file);
 							$image_url = SERVICE_BASE_URL.'spied/'.$timeline_id.'.jpg';
 
-							$room_id = create_room(get_user_by_plusid($notification['userToken']), $image_url);
+							$room_id = create_room($user_info, $image_url);
 
 							$room_info = get_room_info_by_id($room_id);
 
