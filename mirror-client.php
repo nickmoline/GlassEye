@@ -155,7 +155,7 @@ function send_clue_out($clue, $room_info) {
 		<img src="{$spy_image_left}" />
 	</figure>
 	<section>
-		<table class="text-small" align-justia">
+		<table class="text-small" align-justify">
 			<tbody>
 				<tr>
 					<td>{$room_info['name']} spied with {$room_info['gender']} glass eye, something...</td>
@@ -235,7 +235,7 @@ function send_answer_back_to_team($question, $response, $room_info, $asker_info)
 		<img src="{$spy_image_left}" />
 	</figure>
 	<section>
-		<table class="text-small" align-justia">
+		<table class="text-small" align-justify">
 			<tbody>
 				<tr>
 					<td>{$asker_info['name']} asked:</td>
@@ -289,7 +289,7 @@ function ask_creator_question($question, $room_info, $asker_info) {
 		<img src="{$spy_image_left}" />
 	</figure>
 	<section>
-		<table class="text-small" align-justia">
+		<table class="text-small" align-justify">
 			<tbody>
 				<tr>
 					<td>{$question}</td>
