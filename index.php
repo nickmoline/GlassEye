@@ -16,11 +16,7 @@
  */
 
 require_once 'config.php';
-require_once 'google-api-php-client/src/Google_Client.php';
-require_once 'google-api-php-client/src/contrib/Google_GlassService.php';
-require_once 'google-api-php-client/src/contrib/Google_PlusService.php';
 require_once 'mirror-client.php';
-require_once 'plus-client.php';
 
 
 // Set your cached access token. Remember to replace $_SESSION with a
@@ -75,9 +71,9 @@ if (!$client->getAccessToken()) {
     subscribeToNotifications($glass, $plus->people->get("me"), $_POST['callback']);
     echo "<div class=''>Subscription inserted</div>";
   } else if (isset($_POST['operation']) && $_POST['operation'] == "insertShareTarget") {
-    #FYI: Share target icons will not work unless you deploy to a publicly accessible server
-    insertShareTarget($glass, "starter-project", "Starter Project",
-        $service_base_url . "/static/icons/run.png");
+    #FYI: Share target icons will not work unless you deploy to a publicly accessible server.
+    insertShareTarget($glass, "glass-eye", "Glass Eye",
+        $service_base_url . "/images/logoHorizontal.png");
     echo "<div class=''>Share target inserted. Enable it on the control panel to use it.</div>";
   }
   ?>
@@ -101,7 +97,7 @@ if (!$client->getAccessToken()) {
          value="<?= $service_base_url . "/notify.php" ?>"/><br/>
   <button type="submit">Subscribe to timeline updates</button>
 </form>
-<h2>Share Targets</h2>
+<h2>[Glass Eye] Install Share Target</h2>
 <form method="post">
   <input type="hidden" name="operation" value="insertShareTarget"/>
   <button type="submit">Insert a share target</button>

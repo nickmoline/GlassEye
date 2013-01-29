@@ -539,3 +539,31 @@ function add_menu_item($id, $action = 'REPLY') {
 	return $menuItem;
 }
 
+function subscribeToNotifications($service, $userToken, $callbackUrl) {
+  try {
+    $subscription = new Google_Subscription();
+    $subscription->setCollection('timeline');
+    $subscription->setUserToken($userToken);
+    $subscription->setCallbackUrl($callbackUrl);
+    $service->subscriptions->insert($subscription);
+  } catch (Exception $e) {
+    print 'An error ocurred: ' . $e->getMessage();
+  }
+}
+
+
+/**
+ * Insert Share Target
+ */
+function insertShareTarget($service, $shareTargetId, $displayName, $iconUrl) {
+  try {
+    $shareTarget = new Google_Entity();
+    $shareTarget->setId($shareTargetId);
+    $shareTarget->setDisplayName($displayName);
+    $shareTarget->setImageUrls(array($iconUrl));
+    return $service->shareTargets->insert($shareTarget);
+  } catch (Exception $e) {
+    print 'An error ocurred: ' . $e->getMessage();
+    return null;
+  }
+}
