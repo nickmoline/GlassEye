@@ -189,6 +189,37 @@ EndOfCreatorClue;
 	}
 }
 
+function prompt_for_clue($room_info) {
+
+}
+
+function create_room($creator_info, $photo_url) {
+	global $db;
+
+	$stmt = $db->prepare(
+		'INSERT INTO rooms 
+			(
+				room_name, 
+				room_creator_user_id, 
+				room_create_timestamp, 
+				image_url
+			)
+		VALUES
+			(
+				:name,
+				:uid,
+				:ts,
+				:image
+			)
+	');
+	$stmt->bindValue(':name',	$creator_info['user_name'], PDO::PARAM_STR);
+	$stmt->bindValue(':uid', 	$creator_info['user_id'],	PDO::PARAM_INT);
+	$stmt->bindValue(':ts',		date("Y-m-d H:i:s"),		PDO::PARAM_STR);
+	$stmt->bindValue(':image',	$photo_url,					PDO::PARAM_STR);
+	$stmt->execute();
+	return $db->lastInsertId();
+}
+
 /**
  * Gets room information by room id (including owner user information)
  *
