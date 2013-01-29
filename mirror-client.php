@@ -221,14 +221,14 @@ function get_room_info_by_id($room_id) {
 function get_message_by_timeline_id($timeline_id) {
 	global $db;
 	$stmt = $db->prepare(
-"SELECT 
-		t.*, m.*, u.*, r.* 
-	FROM messages_timeline t 
-	INNER JOIN messages m ON (t.message_id = m.message_id) 
-	INNER JOIN users u ON (t.user_id = u.user_id) 
-	INNER JOIN rooms r ON (m.room_id = r.room_id)
-	WHERE t.timeline_id = :timelineid"
-);
+		"SELECT 
+				t.*, m.*, u.*, r.* 
+			FROM messages_timeline t 
+			INNER JOIN messages m ON (t.message_id = m.message_id) 
+			INNER JOIN users u ON (t.user_id = u.user_id) 
+			INNER JOIN rooms r ON (m.room_id = r.room_id)
+			WHERE t.timeline_id = :timelineid"
+	);
 	$stmt->bindValue(":timelineid", $timeline_id, PDO::PARAM_STR);
 	$stmt->execute();
 	return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -326,7 +326,35 @@ EndOfCreatorAnswer;
 		$menu_items[] = add_menu_item('ask-question', 'REPLY');
 	}
 
+	$room_id = $room_info['room_id'];
+	$message_id = insert_message_into_db($room_id, $room['room_creator_user_id'], $question, $answer_text, $html, date("Y-m-d H:i:s"));
+	
+	$recipients = get_room_recipients($room_info['room_id'], false);
+
+	foreach ($recipients as $recipient_info) {
+		$item = insertTimelineItem($html, $menu_items, $recipient_info['user_token'], $recipient_info['thread_id'], true, true, $spoken_text);	
+		insert_message_timeline_into_db($message_id, $recipient_info['user_id'], $item['id'], $item['created']);
+	}
+}
+
+/**
+ * Insert message into the database and return its id
+ *
+ * @author nickmoline
+ * @version 0.1
+ * @since 0.1
+ * @param int $room_id Room ID
+ * @param int $creator_uid Creator User ID
+ * @param string $message_text Message Plain Text
+ * @param string $message_response Response Plain Text
+ * @param string $message_html Full HTML version of message
+ * @param string $message_timestamp in format strtotime() can understand
+ * @param string $created_timeline_id [Optional] Optional Timeline ID of the created item
+ * @return int $message_id
+ */
+function insert_message_into_db($room_id, $creator_uid, $message_text, $message_response = null, $message_html, $message_timestamp, $created_timeline_id = null) {
 	global $db;
+	
 	$message_stmt = $db->prepare(
 		"INSERT INTO messages
 			(
@@ -342,55 +370,80 @@ EndOfCreatorAnswer;
 			(
 				:roomid,
 				:creatoruid,
+				:creatortimelineid,
 				:messagetext,
 				:messageresponse,
 				:messagehtml,
 				:messagets
 			)"
 	);
-	$message_stmt->bindValue(":roomid", $room_info['room_id'], PDO::PARAM_INT);
-	$message_stmt->bindValue(":creatoruid", $room_info['room_creator_user_id'], PDO::PARAM_INT);
-	$message_stmt->bindValue(":messagetext", $question, PDO::PARAM_STR);
-	$message_stmt->bindValue(":messageresponse", $answer_text, PDO::PARAM_STR);
-	$message_stmt->bindValue(":messagehtml", $html, PDO::PARAM_STR);
-	$message_stmt->bindValue(":messagets", date("Y-m-d H:i:s"), PDO::PARAM_STR);
+	$message_stmt->bindValue(":roomid", $room_id, PDO::PARAM_INT);
+	$message_stmt->bindValue(":creatoruid", $creator_uid, PDO::PARAM_INT);
+	$message_stmt->bindValue(":creatortimelineid", $created_timeline_id, PDO::PARAM_STR);
+	$message_stmt->bindValue(":messagetext", $message_text, PDO::PARAM_STR);
+	$message_stmt->bindValue(":messageresponse", $message_response, PDO::PARAM_STR);
+	$message_stmt->bindValue(":messagehtml", $message_html, PDO::PARAM_STR);
+	$message_stmt->bindValue(":messagets", date("Y-m-d H:i:s",strtotime($message_timestamp)), PDO::PARAM_STR);
 
 	$message_stmt->execute();
-	$message_id = $db->lastInsertId();
+	return $db->lastInsertId();
+}
 
-	$room_id = $room_info['room_id'];
-	$recipients = get_room_recipients($room_info['room_id'], false);
-	$recip_stmt = $db->prepare(
-		"INSERT INTO messages_timeline 
-			(
-				message_id, 
-				user_id, 
-				timeline_id, 
-				sent_timestamp
-			) 
-		VALUES(
-			:messageid, 
-			:userid, 
-			:timelineid, 
-			:senttimestamp
-		)");
+/**
+ * Insert individual recipient information for a message
+ *
+ * @author nickmoline
+ * @version 0.1
+ * @since 0.1
+ * @param int $message_id Message ID
+ * @param int $recip_uid Recipient User ID
+ * @param string $recip_timeline_id Timeline Item ID
+ * @param string $recip_sentts in format strtotime() can understand
+ * @return int $message_timeline_id
+ */
+function insert_message_timeline_into_db($message_id, $recip_uid, $recip_timeline_id, $recip_sentts) {
+	global $db;
+	static $recip_stmt;
+	static $a_message_id;
+	static $a_recip_uid;
+	static $a_recip_timeline_id;
+	static $a_recip_sentts;
 
-	$recip_uid = null;
-	$recip_timeline_id = null;
-	$recip_sentts = null;
+	if (!$recip_stmt) {
+		$recip_stmt = $db->prepare(
+			"INSERT INTO messages_timeline 
+				(
+					message_id, 
+					user_id, 
+					timeline_id, 
+					sent_timestamp
+				) 
+			VALUES 
+				(
+					:messageid, 
+					:userid, 
+					:timelineid, 
+					:senttimestamp
+				)"
+		);
 
-	$recip_stmt->bindValue(":messageid", $message_id, PDO::PARAM_INT);
-	$recip_stmt->bindParam(":userid", $recip_uid, PDO::PARAM_INT);
-	$recip_stmt->bindParam(":timelineid", $recip_timeline_id, PDO::PARAM_STR);
-	$recip_stmt->bindParam(":senttimestamp", $recip_sentts, PDO::PARAM_STR);
+		$recip_uid = null;
+		$recip_timeline_id = null;
+		$recip_sentts = null;
 
-	foreach ($recipients as $recipient_info) {
-		$item = insertTimelineItem($html, $menu_items, $recipient_info['user_token'], $recipient_info['thread_id'], true, true, $spoken_text);
-		$recip_uid = $recipient_info['user_id'];
-		$recip_timeline_id = $item['id'];
-		$recip_sentts = date("Y-m-d H:i:s", strtotime($item['created']));
-		$recip_stmt->execute();
+		$recip_stmt->bindParam(":messageid", $a_message_id, PDO::PARAM_INT);
+		$recip_stmt->bindParam(":userid", $a_recip_uid, PDO::PARAM_INT);
+		$recip_stmt->bindParam(":timelineid", $a_recip_timeline_id, PDO::PARAM_STR);
+		$recip_stmt->bindParam(":senttimestamp", $a_recip_sentts, PDO::PARAM_STR);
 	}
+
+	$a_message_id			= $message_id;
+	$a_recip_uid			= $recip_uid;
+	$a_recip_timeline_id	= $recip_timeline_id;
+	$a_recip_sentts			= date("Y-m-d H:i:s",strtotime($recip_sentts));
+
+	$recip_stmt->execute();
+	return $db->lastInsertId();
 }
 
 /**
@@ -438,7 +491,10 @@ EndOfCreatorQuestion;
 		custom_menu_item('answer-no',	'No',			'cross.png'),
 	);
 
-	return insertTimelineItem($html, $menu_items, $room_info['token'], $room_info['timelineid'], true, true, $spoken_text);
+	$message_id = insert_message_into_db($room_id, $room['room_creator_user_id'], $question, $answer_text, $html, $item['created']);
+	$item = insertTimelineItem($html, $menu_items, $room_info['token'], $room_info['timelineid'], true, true, $spoken_text);
+	insert_message_timeline_into_db($message_id, $recipient_info['user_id'], $item['id'], $item['created']);
+	return $item;
 } 
 
 
