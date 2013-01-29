@@ -1,5 +1,5 @@
 <?php
-echo "<html><head><title>Glass Eye</title></head>Z<body bgcolor=\"black\" text=\"white\"><p align=\"center\"><img src=\"images\header.png\"><br>";
+echo "<html><head><title>Glass Eye</title></head><body bgcolor=\"black\" text=\"white\"><p align=\"center\"><img src=\"images\header.png\"></p>";
 
 require_once("config.php");
 require_once("mirror-client.php");
@@ -18,9 +18,9 @@ else
 echo "
 <form method=\"post\">
   <input type=\"hidden\" name=\"operation\" value=\"installApp\"/>
-  <input type=\"image\" src=\"images\yes.png\" name=\"submit\" border=\"0\">
+  <p align=\"center\"><input type=\"image\" src=\"images\yes.png\" name=\"submit\" border=\"0\"></p>
 </form>";
 }
 
-echo "</p></body></html>";
+echo "</body></html>";
 ?>
