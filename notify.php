@@ -85,13 +85,14 @@ if($post_body != null) {
 							fwrite($out, $image_file);
 							$image_url = SERVICE_BASE_URL.'spied/'.$timeline_id.'.jpg';
 
-							$room_id = create_room($user_info, $image_url);
-
-							$room_info = get_room_info_by_id($room_id);
 
 
 						}
+
 					}
+				$room_id = create_room($user_info, $image_url);
+				$room_info = get_room_info_by_id($room_id);
+
 				}
 			}
 		}
