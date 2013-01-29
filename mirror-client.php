@@ -79,7 +79,7 @@ function get_plus($access_token = null) {
 	static $plus;
 
 	if (!$plus) {
-		$plus = Google_PlusService(get_gclient($access_token));
+		$plus = new Google_PlusService(get_gclient($access_token));
 	}
 }
 
