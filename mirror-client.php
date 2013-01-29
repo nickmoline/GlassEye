@@ -571,7 +571,6 @@ function login_user() {
 	$plus = new Google_PlusService($client);
 	$profile = $plus->people->get("me");
 
-	print_r($profile);
 	$plus_id = $profile['id'];
 	$plus_name = $profile['name']['formatted'];
 
