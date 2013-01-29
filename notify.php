@@ -59,9 +59,14 @@ if($post_body != null) {
 			}
 		}
 	} else {
+		$dump = fopen ('/tmp/glassnotifydump.txt','a');
+		fwrite($dump, print_r($glass,true));
+		fwrite($dump, print_r($notification,true));
 		$timelineItem = $glass->timeline->get($notification['itemId']);
+		fwrite($dump, print_r($timelineItem,true));
 
 		$share_targets = $timelineItem->getShareTargets();
+		fwrite($dump, print_r($share_targets, true));
 
 		$timeline_id = $timelineItem->getId();
 
