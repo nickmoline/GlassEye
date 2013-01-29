@@ -35,7 +35,8 @@ if($post_body != null) {
 	$user_info = get_user_by_plusid($notification['userToken']);
 
 	$glass = get_glass($user_info['user_token']);
-
+	$client = get_gclient($user_info['user_token']);
+	
 	if (array_key_exists('menuActions',$notification)) {
 		foreach ($notification['menuActions'] as $action) {
 			$previous_answer = get_message_by_timeline_id($notification['itemId']);
@@ -65,19 +66,24 @@ if($post_body != null) {
 		$timelineItem = $glass->timeline->get($notification['itemId']);
 		fwrite($dump, print_r($timelineItem,true));
 
-		$share_targets = $timelineItem->getShareTargets();
+		$share_targets = array();
+		if (array_key_exists('shareTargets',$timelineItem)) {
+			$share_targets = $timelineItem['shareTargets'];
+		}
+		//$share_targets = $timelineItem->getShareTargets();
 		fwrite($dump, print_r($share_targets, true));
 
-		$timeline_id = $timelineItem->getId();
+		$timeline_id = $timelineItem['id'];
 
 		$image_url = '';
 
 		foreach ($share_targets as $share_target) {
 			if ($share_target->getId() == 'glass-eye') {
-				$attachments = $timelineItem->getAttachments();
+				$attachments = $timelineItem['attachments'];
 				if ($attachments) {
 					foreach ($attachments as $attachment) {
 						$request = new Google_HttpRequest($attachment['contentUrl'], 'GET', null, null);
+    					
     					$httpRequest = Google_Client::$io->authenticatedRequest($request);
 						if ($httpRequest->getResponseHttpCode() == 200) {
 							$image_file = $httpRequest->getResponseBody();
