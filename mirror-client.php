@@ -253,7 +253,7 @@ function get_room_recipients($room_id, $game_start = false) {
 		$stmt->bindValue(":roomid", $room_id, PDO::PARAM_INT);
 	}
 	$stmt->execute();
-	return $stmt->fetchAll();
+	return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /**
