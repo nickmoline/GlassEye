@@ -27,7 +27,7 @@ function get_gclient($access_token = null) {
 
 	if (!$client) {
 		$client = new Google_Client();
-		$client->setApplicatonName(APPLICATION_NAME);
+		$client->setApplicationName(APPLICATION_NAME);
 		$client->setClientId(API_CLIENT_ID);
 		$client->setClientSecret(API_CLIENT_SECRET);
 		$client->setDeveloperKey(API_SIMPLE_KEY);
