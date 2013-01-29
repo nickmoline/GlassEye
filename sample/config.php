@@ -21,4 +21,4 @@ $api_client_id = "862810043441-5ltusk02nu0ei5mdkdvpv6qi0dcdsvup.apps.googleuserc
 $api_client_secret = "IhJvx_BR3iNt3fbRtnPqIfto";
 $api_simple_key = "AIzaSyD5tkma1YOOcIwANNG5QmuaNnk9ZG_WOGw";
 
-$service_base_url = "http://glassteam2013.ocdhost.com/";
+$service_base_url = "http://glassteam2013.ocdhost.com/sample";
