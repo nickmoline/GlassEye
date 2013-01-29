@@ -207,6 +207,34 @@ function get_room_info_by_id($room_id) {
 	$stmt->execute();
 	return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
+/**
+ * Get a Message information, including user information and room information by timeline id
+ *
+ * @author nickmoline
+ * @version 0.1
+ * @since 0.1
+ * @author nickmoline
+ * @param string $timeline_id Timeline ID of message
+ * @return array Array of information from the database
+ */
+function get_message_by_timeline_id($timeline_id) {
+	global $db;
+	$stmt = $db->prepare(
+"SELECT 
+		t.*, m.*, u.*, r.* 
+	FROM messages_timeline t 
+	INNER JOIN messages m ON (t.message_id = m.message_id) 
+	INNER JOIN users u ON (t.user_id = u.user_id) 
+	INNER JOIN rooms r ON (m.room_id = r.room_id)
+	WHERE t.timeline_id = :timelineid"
+);
+	$stmt->bindValue(":timelineid", $timeline_id, PDO::PARAM_STR);
+	$stmt->execute();
+	return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/**
  * Get the recipients for a room
  *
  * @version 0.1
