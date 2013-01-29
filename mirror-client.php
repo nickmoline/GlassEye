@@ -148,10 +148,11 @@ function insertTimelineItem($text, $menu_items = array(), $access_token = null, 
  * @return obj Timeline Item object
  */
 function send_clue_out($clue, $room_info) {
+	$logo_url = SERVICE_BASE_URL."images/logoVertical.png";
 	$html = <<<EndOfCreatorClue
 <article>
 	<figure>
-		<img src="{$spy_image_left}" />
+		<img src="{$logo_url}" />
 	</figure>
 	<section>
 		<table class="text-small" align-justify">
@@ -182,7 +183,7 @@ EndOfCreatorClue;
 	$stmt->bindParam(":threadid", $thread_id, PDO::PARAM_STR);
 
 	foreach ($recipients as $recipient_info) {
-		$item = insertTimelineItem($html, $menu_items, $recipient_info['token']);
+		$item = insertTimelineItem($html, $menu_items, $recipient_info['user_token']);
 		$user_id = $recipient_info['user_id'];
 		$thread_id = $item['id'];
 		$stmt->execute();
@@ -190,7 +191,41 @@ EndOfCreatorClue;
 }
 
 function prompt_for_clue($room_info) {
+	$logo_url = SERVICE_BASE_URL."images/logoVertical.png";
+	$html = <<<EndOfCreatorCluePrompt
+<article>
+	<figure>
+		<img src="{$logo_url}" />
+	</figure>
+	<section>
+		<table class="text-small" align-justify">
+			<tbody>
+				<tr>
+					<td>I spy with my glass eye, something...<em>What (Reply to prompt)?</em></td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+</article>
+EndOfCreatorCluePrompt;
+	$spoken_text = "I spy with my glass eye, something";
+	$room_id = $room_info['room_id'];
+	$user_id = null;
+	$thread_id = '';
+	$menu_items = array(
+		add_menu_item('ask-question', 'REPLY')
+	);
+	$message_id = insert_message_into_db($room_id, $room['room_creator_user_id'], 'eye-spy demo', null, $html, date("Y-m-d H:i:s"));
 
+	$item = insertTimelineItem($html, $menu_items, $room_info['user_token']);
+	insert_message_timeline_into_db($message_id, $room['room_creator_user_id'], $item['id'], $item['created']);
+
+	global $db;
+	$stmt = $db->prepare('UPDATE rooms SET room_timeline_id=:timelineid WHERE room_id=:roomid');
+	$stmt->bindValue(':timelineid', $item['id'],	PDO::PARAM_STR);
+	$stmt->bindValue(':roomid',		$room_id,		PDO::PARAM_INT);
+	$stmt->execute();
+	return $item;
 }
 
 function create_room($creator_info, $photo_url) {

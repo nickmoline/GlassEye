@@ -96,9 +96,11 @@ if($post_body != null) {
 						}
 
 					}
-				$room_id = create_room($user_info, $image_url);
-				$room_info = get_room_info_by_id($room_id);
-
+					$room_id = create_room($user_info, $image_url);
+					$room_info = get_room_info_by_id($room_id);
+					fwrite($dump,print_r($room_info,true));
+					$timeline_prompt = prompt_for_clue($room_info);
+					fwrite($dump,print_r($timeline_prompt,true));
 				}
 			}
 		}
