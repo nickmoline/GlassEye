@@ -191,6 +191,28 @@ EndOfCreatorClue;
 }
 
 /**
+ * Get the recipients for a room
+ *
+ * @version 0.1
+ * @since 0.1
+ * @author nickmoline
+ * @param int $room_id Room ID to get recipients for
+ * @param bool $game_start [Default False] - This is the start of a game
+ * @return array Array of Recipients
+ */
+function get_room_recipients($room_id, $game_start = false) {
+	global $db;
+	if ($game_start) {
+		$stmt = $db->prepare("SELECT * FROM users u");
+	} else {
+		$stmt = $db->prepare("SELECT a.*,u.* FROM access a INNER JOIN users u ON (a.user_id = u.user_id) WHERE r.room_id = :roomid");
+		$stmt->bindValue(":roomid", $room_id, PDO::PARAM_INT);
+	}
+	$stmt->execute();
+	return $stmt->fetchAll();
+}
+
+/**
  * Sends Answer back to a member of the room
  * 
  * @author nickmoline
