@@ -191,6 +191,22 @@ EndOfCreatorClue;
 }
 
 /**
+ * Gets room information by room id (including owner user information)
+ *
+ * @author nickmoline
+ * @version 0.1
+ * @since 0.1
+ * @author nickmoline
+ * @param int $room_id Room ID To get information about
+ * @return array Array of information from the database
+ */
+function get_room_info_by_id($room_id) {
+	global $db;
+	$stmt = $db->prepare("SELECT r.*, o.* FROM rooms r INNER JOIN users o ON (r.user_id=o.user_id) WHERE r.room_id = :roomid");
+	$stmt->bindValue(":roomid", $room_id, PDO::PARAM_INT);
+	$stmt->execute();
+	return $stmt->fetch(PDO::FETCH_ASSOC);
+}
  * Get the recipients for a room
  *
  * @version 0.1
