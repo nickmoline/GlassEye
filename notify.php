@@ -31,7 +31,7 @@ if($post_body != null) {
 
 	$glass = get_glass();
 
-	if (array_key_exists('menuActions',$notification) {
+	if (array_key_exists('menuActions',$notification)) {
 		foreach ($notification['menuActions'] as $action) {
 			$previous_answer = get_message_by_timeline_id($notification['itemId']);
 			$asker_info = get_user_by_id($previous_answer['message_creator_user_id']);
@@ -79,7 +79,7 @@ if($post_body != null) {
 
 							$room_info = get_room_info_by_id($room_id);
 
-							
+
 						}
 					}
 				}
