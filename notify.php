@@ -18,6 +18,9 @@
 // Dumps received notifications to a text file
 // This is where you would do cool stuff based on notifications
 
+require_once("config.php");
+require_once("mirror-client.php");
+
 $filename = "/tmp/glass-notify.txt";
 $file = fopen( $filename, "a+" );
 if( $file == false ) {
