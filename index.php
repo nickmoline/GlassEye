@@ -1,5 +1,6 @@
 <?php
 session_start();
+ini_set('display_errors','On');
 require_once("config.php");
 require_once("mirror-client.php");
 
