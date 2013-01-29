@@ -572,7 +572,7 @@ function login_user() {
 	$profile = $plus->people->get("me");
 
 	$plus_id = $profile['id'];
-	$plus_name = $profile['name']['formatted'];
+	$plus_name = $profile['displayName'];
 
 	save_userinfo($token, $plus_id, $plus_name);
 
