@@ -116,6 +116,7 @@ function insertTimelineItem($text, $menu_items = array(), $access_token = null, 
 	}
 	$menuItem = new Google_MenuItem();
 	$menuItem->setAction("REPLY");
+	if (!is_array($menu_items)) { $menu_items = array(); }
 	array_push($menu_items, $menuItem);
 	$creator = new Google_Entity();
 	$creator->setId('glass-eye');
