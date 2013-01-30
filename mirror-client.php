@@ -223,9 +223,10 @@ EndOfCreatorCluePrompt;
 	$menu_items = array(
 		add_menu_item('REPLY')
 	);
-	$message_id = insert_message_into_db($room_id, $room['room_creator_user_id'], 'eye-spy demo', null, $html, date("Y-m-d H:i:s"));
-
 	$item = insertTimelineItem($html, $menu_items, $room_info['user_token'], null, true, true, true, $spoken_text);
+
+	$message_id = insert_message_into_db($room_id, $room['room_creator_user_id'], 'eye-spy demo', '', $html, date("Y-m-d H:i:s"),$item['id']);
+
 	insert_message_timeline_into_db($message_id, $room['room_creator_user_id'], $item['id'], $item['created']);
 
 	global $db;
@@ -425,7 +426,7 @@ EndOfCreatorAnswer;
  * @param string $created_timeline_id [Optional] Optional Timeline ID of the created item
  * @return int $message_id
  */
-function insert_message_into_db($room_id, $creator_uid, $message_text, $message_response = null, $message_html, $message_timestamp, $created_timeline_id = null) {
+function insert_message_into_db($room_id, $creator_uid, $message_text, $message_response = '', $message_html, $message_timestamp, $created_timeline_id = '') {
 	global $db;
 	
 	$message_stmt = $db->prepare(

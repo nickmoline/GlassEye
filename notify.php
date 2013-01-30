@@ -70,7 +70,7 @@ if($post_body != null) {
 			$parent_item = $timelineItem['inReplyTo'];
 			$parent_item_info = get_message_by_timeline_id($parent_item);
 			$room_info = get_room_info_by_id($parent_item_info['room_id']);
-
+			fwrite($dump, print_r($room_info,true));
 			if (!$room_info['room_timeline_id'] && $room_info['room_creator_user_id'] == $user_info['user_id']) {
 				$clue = send_clue_out($timelineItem['text'], $room_info);
 				fwrite($dump, "CLUE!!!");
