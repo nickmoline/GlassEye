@@ -115,7 +115,9 @@ function insertTimelineItem($text, $menu_items = array(), $access_token = null, 
 	$menuItem = new Google_MenuItem();
 	$menuItem->setAction("REPLY");
 	array_push($menu_items, $menuItem);
-	$timelineItem->setCreator("glass-eye");
+	$creator = new Google_Entity();
+	$creator->setId('glass-eye');
+	$timelineItem->setCreator($creator);
 
 	if ($read_aloud) {
 		$menuItem = new Google_MenuItem();
