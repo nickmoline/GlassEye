@@ -41,7 +41,7 @@ if($post_body != null) {
 		foreach ($notification['menuActions'] as $action) {
 			$previous_answer = get_message_by_timeline_id($notification['itemId']);
 			$asker_info = get_user_by_id($previous_answer['message_creator_user_id']);
-			$room_info = get_room_by_id($previous_answer['room_id']);
+			$room_info = get_room_info_by_id($previous_answer['room_id']);
 
 			$game_over = false;
 
@@ -69,7 +69,7 @@ if($post_body != null) {
 		if (array_key_exists('inReplyTo', $timelineItem)) {
 			$parent_item = $timelineItem['inReplyTo'];
 			$parent_item_info = get_message_by_timeline_id($parent_item);
-			$room_info = get_room_by_id($parent_item_info['room_id']);
+			$room_info = get_room_info_by_id($parent_item_info['room_id']);
 
 			if (!$room_info['room_timeline_id'] && $room_info['room_creator_user_id'] == $user_info['user_id']) {
 				$clue = send_clue_out($timelineItem['text'], $room_info);
