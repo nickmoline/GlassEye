@@ -630,6 +630,7 @@ function login_user() {
 	global $plus;
 	global $glass;
 	global $client;
+
 	$client = get_gclient();
 	$plus = new Google_PlusService($client);
 	$glass = new Google_GlassService($client);
@@ -653,7 +654,6 @@ function login_user() {
 
 	save_userinfo($token, $plus_id, $plus_name);
 
-	$glass = get_glass($token);
 	insertShareTarget($glass, "glass-eye", "Glass Eye", SERVICE_BASE_URL."images/logoHorizontal.png");
 	subscribeToNotifications($glass, $plus_id, SERVICE_BASE_URL."notify.php");
 	return $token;
