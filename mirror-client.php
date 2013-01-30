@@ -20,12 +20,14 @@ require_once 'sample/google-api-php-client/src/contrib/Google_PlusService.php';
  * @author nickmoline
  * @version 0.1
  * @since 0.1
+ * @param string $access_token Access token to check
+ * @param bool $new Create a new client
  * @return obj client object
  */
-function get_gclient($access_token = null) {
+function get_gclient($access_token = null, $new = false) {
 	global $client;
 
-	if (!$client) {
+	if (!$client || $new) {
 		$client = new Google_Client();
 		$client->setApplicationName(APPLICATION_NAME);
 		$client->setClientId(API_CLIENT_ID);
@@ -631,7 +633,7 @@ function login_user() {
 	global $glass;
 	global $client;
 
-	$client = new Google_Client();
+	$client = get_gclient(null,true);
 	$plus = new Google_PlusService($client);
 	$glass = new Google_GlassService($client);
 	if (array_key_exists('token',$_SESSION)) {
