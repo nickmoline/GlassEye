@@ -281,7 +281,7 @@ function create_room($creator_info, $photo_url) {
  */
 function get_room_info_by_id($room_id) {
 	global $db;
-	$stmt = $db->prepare("SELECT r.*, o.* FROM rooms r INNER JOIN users o ON (r.user_id=o.user_id) WHERE r.room_id = :roomid");
+	$stmt = $db->prepare("SELECT r.*, o.* FROM rooms r INNER JOIN users o ON (r.room_creator_user_id=o.user_id) WHERE r.room_id = :roomid");
 	$stmt->bindValue(":roomid", $room_id, PDO::PARAM_INT);
 	$stmt->execute();
 	return $stmt->fetch(PDO::FETCH_ASSOC);
