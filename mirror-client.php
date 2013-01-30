@@ -631,7 +631,7 @@ function login_user() {
 	global $glass;
 	global $client;
 
-	$client = get_gclient();
+	$client = new Google_Client();
 	$plus = new Google_PlusService($client);
 	$glass = new Google_GlassService($client);
 	if (array_key_exists('token',$_SESSION)) {
