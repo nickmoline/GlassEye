@@ -165,7 +165,7 @@ function send_clue_out($clue, $room_info) {
 		<table class="text-small" align-justify">
 			<tbody>
 				<tr>
-					<td>{$room_info['name']} spied with {$room_info['gender']} glass eye, something...</td>
+					<td>{$room_info['room_name']} spied with his glass eye, something...</td>
 				</tr>
 				<tr>
 					<td>{$clue}</td>
@@ -176,7 +176,7 @@ function send_clue_out($clue, $room_info) {
 </article>
 EndOfCreatorClue;
 
-	$spoken_text = "{$room_info['name']} spied with {$room_info['gender']} glass eye, something {$clue}";
+	$spoken_text = "{$room_info['room_name']} spied with his glass eye, something {$clue}";
 
 	$room_id = $room_info['room_id'];
 	$user_id = null;
@@ -195,6 +195,7 @@ EndOfCreatorClue;
 		$thread_id = $item['id'];
 		$stmt->execute();
 	}
+	return $item;
 }
 
 function prompt_for_clue($room_info) {

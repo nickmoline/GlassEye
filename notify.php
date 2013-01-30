@@ -73,6 +73,9 @@ if($post_body != null) {
 
 			if (!$room_info['room_timeline_id'] && $room_info['room_creator_user_id'] == $user_info['user_id']) {
 				$clue = send_clue_out($timelineItem['text'], $room_info);
+				fwrite($dump, "CLUE!!!");
+				fwrite($dump, print_R($clue,true));
+				fwrite($dump, "CLUE!!!");
 			}
 		} else {
 			$share_targets = array();
