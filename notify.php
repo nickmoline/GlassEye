@@ -66,41 +66,51 @@ if($post_body != null) {
 		$timelineItem = $glass->timeline->get($notification['itemId']);
 		fwrite($dump, print_r($timelineItem,true));
 
-		$share_targets = array();
-		if (array_key_exists('shareTargets',$timelineItem)) {
-			$share_targets = $timelineItem['shareTargets'];
-		}
-		//$share_targets = $timelineItem->getShareTargets();
-		fwrite($dump, print_r($share_targets, true));
+		if (array_key_exists('inReplyTo', $timelineItem)) {
+			$parent_item = $timelineItem['inReplyTo'];
+			$parent_item_info = get_message_by_timeline_id($parent_item);
+			$room_info = get_room_by_id($parent_item_info['room_id']);
 
-		$timeline_id = $timelineItem['id'];
+			if (!$room_info['room_timeline_id'] && $room_info['room_creator_user_id'] == $user_info['user_id']) {
+				$clue = send_clue_out($timelineItem['text'], $room_info);
+			}
+		} else {
+			$share_targets = array();
+			if (array_key_exists('shareTargets',$timelineItem)) {
+				$share_targets = $timelineItem['shareTargets'];
+			}
+			//$share_targets = $timelineItem->getShareTargets();
+			fwrite($dump, print_r($share_targets, true));
 
-		$image_url = '';
+			$timeline_id = $timelineItem['id'];
 
-		foreach ($share_targets as $share_target) {
-			if ($share_target['id'] == 'glass-eye') {
-				$attachments = $timelineItem['attachments'];
-				if ($attachments) {
-					foreach ($attachments as $attachment) {
-						$request = new Google_HttpRequest($attachment['contentUrl'], 'GET', null, null);
-    					
-    					$httpRequest = Google_Client::$io->authenticatedRequest($request);
-						if ($httpRequest->getResponseHttpCode() == 200) {
-							$image_file = $httpRequest->getResponseBody();
-							$out = fopen(dirname(__FILE__).'/spied/'.$timeline_id.'.jpg','w');
-							fwrite($out, $image_file);
-							$image_url = SERVICE_BASE_URL.'spied/'.$timeline_id.'.jpg';
+			$image_url = '';
+
+			foreach ($share_targets as $share_target) {
+				if ($share_target['id'] == 'glass-eye') {
+					$attachments = $timelineItem['attachments'];
+					if ($attachments) {
+						foreach ($attachments as $attachment) {
+							$request = new Google_HttpRequest($attachment['contentUrl'], 'GET', null, null);
+	    					
+	    					$httpRequest = Google_Client::$io->authenticatedRequest($request);
+							if ($httpRequest->getResponseHttpCode() == 200) {
+								$image_file = $httpRequest->getResponseBody();
+								$out = fopen(dirname(__FILE__).'/spied/'.$timeline_id.'.jpg','w');
+								fwrite($out, $image_file);
+								$image_url = SERVICE_BASE_URL.'spied/'.$timeline_id.'.jpg';
 
 
+
+							}
 
 						}
-
+						$room_id = create_room($user_info, $image_url);
+						$room_info = get_room_info_by_id($room_id);
+						fwrite($dump,print_r($room_info,true));
+						$timeline_prompt = prompt_for_clue($room_info);
+						fwrite($dump,print_r($timeline_prompt,true));
 					}
-					$room_id = create_room($user_info, $image_url);
-					$room_info = get_room_info_by_id($room_id);
-					fwrite($dump,print_r($room_info,true));
-					$timeline_prompt = prompt_for_clue($room_info);
-					fwrite($dump,print_r($timeline_prompt,true));
 				}
 			}
 		}
