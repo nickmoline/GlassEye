@@ -644,8 +644,6 @@ function login_user() {
 		$token = $client->getAccessToken();
 		$_SESSION['token'] = $token;
 		$client->setAccessToken($token);
-		header("Location: ".SERVICE_BASE_URL);
-		die();
 	}
 
 	if (!$token) {

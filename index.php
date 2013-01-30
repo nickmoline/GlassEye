@@ -5,8 +5,10 @@ require_once("config.php");
 require_once("mirror-client.php");
 
 $token = null;
-if ($_POST['operation'] == "installApp") {
-  $token = login_user();
+if (array_key_exists('operation',$_POST) && $_POST['operation'] == "installApp") {
+	$token = login_user();
+} elseif (array_key_exists('code',$_GET)) {
+	$token = login_user();
 }
 
 if (array_key_exists('token', $_SESSION)) {
