@@ -23,7 +23,7 @@ require_once 'sample/google-api-php-client/src/contrib/Google_PlusService.php';
  * @return obj client object
  */
 function get_gclient($access_token = null) {
-	static $client;
+	global $client;
 
 	if (!$client) {
 		$client = new Google_Client();
@@ -58,7 +58,7 @@ function get_gclient($access_token = null) {
  * @return obj glass object
  */
 function get_glass($access_token = null) {
-	static $glass;
+	global $glass;
 
 	if (!$glass) {
 		$glass = new Google_GlassService(get_gclient($access_token));
@@ -76,7 +76,7 @@ function get_glass($access_token = null) {
  * @return obj plus object
  */
 function get_plus($access_token = null) {
-	static $plus;
+	global $plus;
 
 	if (!$plus) {
 		$plus = new Google_PlusService(get_gclient($access_token));
@@ -627,6 +627,9 @@ function login_user() {
 	session_start();
 	$token = null;
 
+	global $plus;
+	global $glass;
+	global $client;
 	$client = get_gclient();
 	$plus = new Google_PlusService($client);
 	$glass = new Google_GlassService($client);
