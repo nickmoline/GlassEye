@@ -628,6 +628,8 @@ function login_user() {
 	$token = null;
 
 	$client = get_gclient();
+	$plus = new Google_PlusService($client);
+	$glass = new Google_GlassService($client);
 	if (array_key_exists('token',$_SESSION)) {
 		$token = $_SESSION['token'];
 		$client->setAccessToken($token);
@@ -641,7 +643,6 @@ function login_user() {
 		die();
 	}
 
-	$plus = new Google_PlusService($client);
 	$profile = $plus->people->get("me");
 
 	$plus_id = $profile['id'];
