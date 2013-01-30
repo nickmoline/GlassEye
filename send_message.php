@@ -13,6 +13,8 @@
 require_once 'config.php';
 require_once 'mirror-client.php';
 
+ini_set('display_errors','On');
+
 
 $room_id = 41;
 
