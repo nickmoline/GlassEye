@@ -641,7 +641,9 @@ function login_user() {
 		$client->setAccessToken($token);
 	} elseif (array_key_exists('code',$_GET)) {
 		$client->authenticate();
-		$_SESSION['token'] = $token = $client->getAccessToken();
+		$token = $client->getAccessToken();
+		$_SESSION['token'] = $token;
+		$client->setAccessToken($token);
 	}
 
 	if (!$token) {
