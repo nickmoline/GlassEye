@@ -18,4 +18,6 @@ $room_id = 41;
 
 $room_info = get_room_info_by_id($room_id);
 
+print_r($room_info);
+
 send_clue_out("Red", $room_info);
