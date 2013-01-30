@@ -192,6 +192,8 @@ EndOfCreatorClue;
 	$stmt->bindParam(":userid", $user_id, PDO::PARAM_INT);
 	$stmt->bindParam(":threadid", $thread_id, PDO::PARAM_STR);
 
+	$menu_items = array();
+
 	foreach ($recipients as $recipient_info) {
 		$item = insertTimelineItem($html, $menu_items, $recipient_info['user_token']);
 		$user_id = $recipient_info['user_id'];
