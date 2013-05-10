@@ -1,4 +1,6 @@
 <?php
+// Copy this file to config.php and fill in the values below to make this work
+
 define('API_CLIENT_ID',		"GOOGLE CLIENT ID");
 define('API_CLIENT_SECRET',	"GOOGLE CLIENT SECRET KEY");
 define('API_SIMPLE_KEY',	"GOOGLE API SIMPLE KEY");
