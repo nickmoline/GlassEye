@@ -26,7 +26,7 @@ This is the social "Eye Spy with my Glass Eye" game that [Nick Moline](http://ni
     <td>&nbsp;</td>
     <td><a href="https://github.com/NathanBFS">NathanBFS</a></td>
     <td><a href="https://plus.google.com/106023745068839045104/about">+Nathan Buth</a></td>
-    <td>&nbsp;</td>
+    <td><a href="https://twitter.com/Glass698">@Glass698</a></td>
     <td>&nbsp;</td>
   </tr>
   <tr>
